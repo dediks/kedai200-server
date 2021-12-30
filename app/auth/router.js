@@ -10,5 +10,6 @@ passport.use(
 
 router.post('/login', multer().none(), controller.login);
 router.post('/register', multer().none(), controller.register);
+router.get('/me', controller.me);
 
 module.exports = router;
