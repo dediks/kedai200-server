@@ -9,6 +9,8 @@ const productsRouter = require('./app/products/router');
 const categoriesRouter = require('./app/categories/router');
 const tagsRouter = require('./app/tags/router');
 
+const { decodeToken } = require('./app/auth/middleware');
+
 var app = express();
 
 // view engine setup
@@ -20,6 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(decodeToken());
 
 app.use('/auth', authRouter);
 app.use('/api', productsRouter);
