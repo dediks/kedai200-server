@@ -5,15 +5,13 @@ const Product = require('./model');
 const Category = require('../categories/model');
 const Tag = require('../tags/model');
 
+const { policyFor } = require('../policy');
+
 async function index(req, res, next) {
   try {
     let { limit = 10, skip = 0, q = '', category = '', tags = [] } = req.query;
 
     let criteria = {};
-
-    if (q.length) {
-      criteria = { ...criteria, name: { $regex: `${q}`, $options: 'i' } };
-    }
 
     if (category.length) {
       category = await Category.findOne({
@@ -25,19 +23,26 @@ async function index(req, res, next) {
       }
     }
 
-    if (tags.length) {
+    if (tags && tags.length) {
       tags = await Tag.find({ name: { $in: tags } });
 
       criteria = { ...criteria, tags: { $in: tags.map((tag) => tag._id) } };
     }
 
-    let products = await Product.find(criteria)
-      .limit(parseInt(limit))
-      .skip(parseInt(skip))
-      .populate('category')
-      .populate('tags');
+    if (q.length) {
+      criteria = { ...criteria, name: { $regex: `${q}`, $options: 'i' } };
+    }
 
-    return res.json(products);
+    let count = await Product.find(criteria).countDocuments();
+
+    let products = await Product.find(criteria)
+      .limit(limit)
+      .skip(skip)
+      .populate('category')
+      .populate('tags')
+      .select('-__v');
+
+    return res.json({ data: products, count });
   } catch (error) {
     next(error);
   }
@@ -45,6 +50,15 @@ async function index(req, res, next) {
 
 async function store(req, res, next) {
   try {
+    let policy = policyFor(req.user);
+
+    if (!policy.can('create', 'Product')) {
+      return res.json({
+        error: 1,
+        message: 'Anda tidak memiliki akses untuk membuat produk',
+      });
+    }
+
     let payload = req.body;
 
     if (payload.category) {
@@ -143,6 +157,15 @@ async function store(req, res, next) {
 
 async function update(req, res, next) {
   try {
+    let policy = policyFor(req.user);
+
+    if (!policy.can('update', 'Product')) {
+      return res.json({
+        error: 1,
+        message: 'Anda tidak memiliki akses untuk membuat produk',
+      });
+    }
+
     let payload = req.body;
 
     if (payload.category) {
@@ -251,6 +274,15 @@ async function update(req, res, next) {
 
 async function destroy(req, res, next) {
   try {
+    let policy = policyFor(req.user);
+
+    if (!policy.can('delete', 'Product')) {
+      return res.json({
+        error: 1,
+        message: 'Anda tidak memiliki akses untuk membuat produk',
+      });
+    }
+
     let product = await Product.findOneAndDelete({ _id: req.params.id });
 
     let currentImage = `${config.rootPath}/public/upload/${product.image_url}`;
