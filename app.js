@@ -12,6 +12,7 @@ const wilayahRouter = require('./app/wilayah/router');
 const deliveryAddressRouter = require('./app/delivery-addresses/router');
 const cartRouter = require('./app/cart/router');
 const orderRouter = require('./app/order/router');
+const invoiceRouter = require('./app/invoice/router');
 
 const { decodeToken } = require('./app/auth/middleware');
 
@@ -37,6 +38,7 @@ app.use('/api', wilayahRouter);
 app.use('/api', deliveryAddressRouter);
 app.use('/api', cartRouter);
 app.use('/api', orderRouter);
+app.use('/api', invoiceRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
