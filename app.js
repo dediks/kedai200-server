@@ -10,6 +10,7 @@ const categoriesRouter = require('./app/categories/router');
 const tagsRouter = require('./app/tags/router');
 const wilayahRouter = require('./app/wilayah/router');
 const deliveryAddressRouter = require('./app/delivery-addresses/router');
+const cartRouter = require('./app/cart/router');
 
 const { decodeToken } = require('./app/auth/middleware');
 
@@ -33,6 +34,7 @@ app.use('/api', categoriesRouter);
 app.use('/api', tagsRouter);
 app.use('/api', wilayahRouter);
 app.use('/api', deliveryAddressRouter);
+app.use('/api', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
