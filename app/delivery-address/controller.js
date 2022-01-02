@@ -2,33 +2,39 @@ const { subject } = require('@casl/ability');
 const DeliveryAddress = require('./model');
 const policyFor = require('../policy');
 
-async function index(req, res, next){
-  const policy = policyFor(req.user)
+async function index(req, res, next) {
+  const policy = policyFor(req.user);
 
-  if(!can('view', 'DeliveryAddress')){
+  if (!can('view', 'DeliveryAddress')) {
     return res.json({
       error: 1,
-      message: 'You are not allowed to perform this action'
-    })
+      message: 'You are not allowed to perform this action',
+    });
   }
 
   try {
-    let { limit = 10, skip=0 } = req.query;
+    let { limit = 10, skip = 0 } = req.query;
 
-    const count = await DeliveryAddress.find({ user: req.user._id}).countDocuments();
+    const count = await DeliveryAddress.find({
+      user: req.user._id,
+    }).countDocuments();
 
-    const deliveryAddresses = await DeliveryAddress.find({ user: req.user._id}).limit(limit).skip(skip).sort('-createdAt');
+    const deliveryAddresses = await DeliveryAddress.find({ user: req.user._id })
+      .limit(limit)
+      .skip(skip)
+      .sort('-createdAt');
 
     return res.json({
-      data: deliveryAddresses, count: count
-    })
+      data: deliveryAddresses,
+      count: count,
+    });
   } catch (error) {
-    if(error && error.name === 'ValidationError'){
+    if (error && error.name === 'ValidationError') {
       return res.json({
         error: 1,
         message: error.message,
-        fields: error.errors
-      })
+        fields: error.errors,
+      });
     }
 
     next(error);
@@ -88,22 +94,24 @@ async function update(req, res, next) {
       });
     }
 
-    address = await DeliveryAddress.findOneAndUpdate({ _id : id, payload, { new: true});
+    address = await DeliveryAddress.findOneAndUpdate(
+      { _id: id, payload },
+      { new: true }
+    );
 
-    return res.json(address)
+    return res.json(address);
   } catch (error) {
-    if(error && error.name === 'ValidationError'){
+    if (error && error.name === 'ValidationError') {
       return res.json({
         error: 1,
         message: error.message,
-        fields: error.errors
-      })
+        fields: error.errors,
+      });
     }
   }
 }
 
-
-async function destroy(req, res, next){
+async function destroy(req, res, next) {
   let policy = policyFor(req.user);
 
   try {
@@ -111,24 +119,27 @@ async function destroy(req, res, next){
 
     let address = await DeliveryAddress.findOne({ _id: id });
 
-    let subjectAddress = subject({ ...address, user: address.user});
+    let subjectAddress = subject({ ...address, user: address.user });
 
-    if(!policy.can('delete', subjectAddress)){
-      return res.json({ error: 1, message: 'You are not allowed to delete this resource'});
+    if (!policy.can('delete', subjectAddress)) {
+      return res.json({
+        error: 1,
+        message: 'You are not allowed to delete this resource',
+      });
     }
 
-    await DeliveryAddress.findOneAndDelete({ _id : id});
+    await DeliveryAddress.findOneAndDelete({ _id: id });
 
-    return res.json(address)
+    return res.json(address);
   } catch (error) {
-    if(error && error.name === 'ValidationError'){
+    if (error && error.name === 'ValidationError') {
       return res.json({
-        error: 1, 
+        error: 1,
         message: error.message,
-        fields: error.errors
-      })
+        fields: error.errors,
+      });
     }
   }
 }
 
-module.exports = { store , update, destroy, index };
+module.exports = { store, update, destroy, index };

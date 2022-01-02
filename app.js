@@ -4,12 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const cors = require('cors');
+
 const authRouter = require('./app/auth/router');
 const productsRouter = require('./app/products/router');
 const categoriesRouter = require('./app/categories/router');
 const tagsRouter = require('./app/tags/router');
 const wilayahRouter = require('./app/wilayah/router');
-const deliveryAddressRouter = require('./app/delivery-addresses/router');
+const deliveryAddressRouter = require('./app/delivery-address/router');
 const cartRouter = require('./app/cart/router');
 const orderRouter = require('./app/order/router');
 const invoiceRouter = require('./app/invoice/router');
@@ -28,6 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(cors());
 app.use(decodeToken());
 
 app.use('/auth', authRouter);

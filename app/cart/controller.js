@@ -1,5 +1,5 @@
 const { policyFor } = require('../policy');
-const CartItem = require('./model');
+const CartItem = require('../cart-item/model');
 const Product = require('../products/model');
 
 async function index(req, res, next) {

@@ -36,10 +36,11 @@ const orderSchema = Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+
     order_items: [
       {
-        types: Schema.Types.ObjectId,
-        ref: 'ObjectItem',
+        type: Schema.Types.ObjectId,
+        ref: 'OrderItem',
       },
     ],
   },
